@@ -6,20 +6,37 @@ import Signin from "./pages/Signin";
 import Signup from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import Header from "./components/Header";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 function App() {
   return (
-    <Router>
-      <Header> 
-      </Header>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/offers" element={<Offers/>} />
-        <Route path="/sign-in" element={<Signin />} />
-        <Route path="/sign-up" element={<Signup />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
-      </Routes>
-    </Router>
+    <>
+      <Router>
+        <Header /> 
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/offers" element={<Offers/>} />
+          <Route path="/sign-in" element={<Signin />} />
+          <Route path="/sign-up" element={<Signup />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+        </Routes>
+        <ToastContainer
+          position="bottom-centre"
+          autoClose={3000}
+          hideProgressBar={false}
+          newestOnTop={false}
+          closeOnClick
+          rtl={false}
+          pauseOnFocusLoss
+          draggable
+          pauseOnHover
+          theme="dark"
+          // transition={Bounce}
+        />
+      </Router>
+    </>
   );
 }
 

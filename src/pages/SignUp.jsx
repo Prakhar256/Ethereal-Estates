@@ -2,6 +2,10 @@ import { useState } from "react";
 import { AiFillEyeInvisible, AiFillEye } from "react-icons/ai";
 import { Link, useNavigate } from "react-router-dom";
 import OAuth from "../components/OAuth";
+import { getAuth, createUserWithEmailAndPassword, updateProfile} from "firebase/auth";
+import {db} from "../firebase";
+import { doc, serverTimestamp, setDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
 
 
 export default function SignUp() {
@@ -19,20 +23,42 @@ export default function SignUp() {
       [e.target.id]: e.target.value,
     }));
   }
+  async function onSubmit(e){
+    e.preventDefault() // prevents refreshing as we wnt single page react app
 
+    try {
+      const auth = getAuth();
+      const userCredential=await
+      createUserWithEmailAndPassword(auth, email, password);
+
+      updateProfile(auth.currentUser,{
+        displayName:name,
+      })
+      const user = userCredential.user;
+      const formDataCopy={... formData};
+      delete formDataCopy.password;
+      formDataCopy.timestamp=serverTimestamp();
+      await setDoc(doc(db,"users",user.uid), formDataCopy)
+      toast.success("Successfully created the account");
+      navigate("/");
+
+    } catch (error) {
+      toast.error("Error signing up! Please check your credentials");
+    }
+  }
   return (
     <section>
       <h1 className="text-3xl text-center mt-6 font-bold">Sign Up</h1>
       <div className="flex justify-center flex-wrap items-center px-6 py-12 max-w-6xl mx-auto">
         <div className="md:w-[67%] lg:w-[50%] mb-12 md:mb-6">
           <img
-            src="https://images.unsplash.com/flagged/photo-1564767609342-620cb19b2357?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1373&q=80"
+            src="https://plus.unsplash.com/premium_photo-1678208875073-046e2f7a29e0?w=800&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8NjF8fGhvbWUlMjBrZXlzfGVufDB8fDB8fHww"
             alt="key"
             className="w-full rounded-2xl"
           />
         </div>
         <div className="w-full md:w-[67%] lg:w-[40%] lg:ml-20">
-          <form>
+          <form onSubmit={onSubmit}>
             <input
               type="text"
               id="name"
