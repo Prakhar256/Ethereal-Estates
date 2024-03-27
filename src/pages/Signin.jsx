@@ -34,10 +34,17 @@ export default function SignIn() {
     e.preventDefault();
     try {
       const auth = getAuth();
-      await signInWithEmailAndPassword(auth, email, password);
-      toast.success("Signed in successfully!");
-      navigate("/");
-    } catch (error) {
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+      if (userCredential.user) {
+        navigate("/");
+        toast.success("Signed in successfully!");
+      }
+     }
+      catch (error) {
       toast.error("Improve user credentials");
     }
   };
