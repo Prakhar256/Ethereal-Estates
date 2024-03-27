@@ -6,7 +6,7 @@ import Signin from "./pages/Signin";
 import Signup from "./pages/SignUp";
 import ForgotPassword from "./pages/ForgotPassword";
 import Header from "./components/Header";
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer, toast, CloseButton } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
@@ -23,7 +23,7 @@ function App() {
           <Route path="/forgot-password" element={<ForgotPassword />} />
         </Routes>
         <ToastContainer
-          position="bottom-centre"
+          position="bottom-right" 
           autoClose={3000}
           hideProgressBar={false}
           newestOnTop={false}
