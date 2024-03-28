@@ -8,4 +8,5 @@ export default function PrivateRoute() {
     return <Spinner/>
   }
   return loggedIn ? <Outlet /> : <Navigate to="/sign-in" />;
+  // agar loggdeIn true hai to app.js me andar wale route pe chala jaayega nhi to navigate to sign-in page
 }
