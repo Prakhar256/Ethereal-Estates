@@ -16,12 +16,13 @@ import { db } from "../firebase";
 import { FcHome } from "react-icons/fc";
 import { useEffect } from "react";
 import ListingItem from "../components/ListingItem";
+
 export default function Profile() {
   const auth = getAuth();
   const navigate = useNavigate();
-  const [changeDetail, setChangeDetail]=useState(false);
-  const [listings, setListings]=useState(null);
-  const [loading, setLoading]=useState(false);
+  const [changeDetail, setChangeDetail] = useState(false);
+  const [listings, setListings] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: auth.currentUser.displayName,
     email: auth.currentUser.email,
@@ -32,34 +33,33 @@ export default function Profile() {
     navigate("/");
   }
   function onChange(e) {
-    setFormData((prevState) => {
-      return {
-        ...prevState,
-        [e.target.id]: e.target.value,
-      };
-    });
+    setFormData((prevState) => ({
+      ...prevState,
+      [e.target.id]: e.target.value,
+    }));
   }
-  async function  onSubmit(){
+  async function onSubmit() {
     try {
-      if(auth.currentUser.displayName !== name){
-        // update the name in firebase auth
-        await updateProfile(auth.currentUser,{
-          displayName : name,
+      if (auth.currentUser.displayName !== name) {
+        //update display name in firebase auth
+        await updateProfile(auth.currentUser, {
+          displayName: name,
         });
-        // update the name in firebase auth
-        const docRef= doc(db, "users", auth.currentUser.uid);
-        await updateDoc(docRef,{name});
-      }
-      toast.success("Your profile has been updated successfully!");
-    }  
 
-    catch (error) {
-      toast.error("Couldn't update the profile details");
+        // update name in the firestore
+
+        const docRef = doc(db, "users", auth.currentUser.uid);
+        await updateDoc(docRef, {
+          name,
+        });
+      }
+      toast.success("Profile details updated");
+    } catch (error) {
+      toast.error("Could not update the profile details");
     }
   }
   useEffect(() => {
     async function fetchUserListings() {
-      setLoading(true);
       const listingRef = collection(db, "listings");
       // when we inserted the images to database (here it is new database named as "listings" in firebase earlier it was "user" database to store sign in information of user)
       const q = query(
@@ -80,10 +80,6 @@ export default function Profile() {
     }
     fetchUserListings();
   }, [auth.currentUser.uid]);
-
-
-  
-
   return (
     <>
       <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
@@ -98,8 +94,8 @@ export default function Profile() {
               value={name}
               disabled={!changeDetail}
               onChange={onChange}
-              className={`mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition ease-in-out 
-              placeholder="Your Full Name"
+              className={`mb-6 w-full px-4 py-2 text-xl text-gray-700 bg-white border border-gray-300 rounded transition ease-in-out ${
+                changeDetail && "bg-red-200 focus:bg-red-200"
               }`}
             />
 
@@ -121,10 +117,9 @@ export default function Profile() {
                     changeDetail && onSubmit();
                     setChangeDetail((prevState) => !prevState);
                   }}
-                  className="text-red-600 hover:text-red-700 transition ease-in-out duration-200 ml-3 cursor-pointer"
+                  className="text-red-600 hover:text-red-700 transition ease-in-out duration-200 ml-1 cursor-pointer"
                 >
                   {changeDetail ? "Apply change" : "Edit"}
-                  {/* Edit */}
                 </span>
               </p>
               <p
@@ -170,3 +165,5 @@ export default function Profile() {
     </>
   );
 }
+
+
