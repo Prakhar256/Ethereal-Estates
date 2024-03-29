@@ -38,6 +38,7 @@ export default function Profile() {
       [e.target.id]: e.target.value,
     }));
   }
+
   async function onSubmit() {
     try {
       if (auth.currentUser.displayName !== name) {
@@ -58,6 +59,7 @@ export default function Profile() {
       toast.error("Could not update the profile details");
     }
   }
+
   useEffect(() => {
     async function fetchUserListings() {
       const listingRef = collection(db, "listings");
@@ -80,6 +82,21 @@ export default function Profile() {
     }
     fetchUserListings();
   }, [auth.currentUser.uid]);
+
+  async function onDelete(listingID){
+    if(window.confirm("Are you sure you want to delete this listing")){
+      await deleteDoc(doc(db, "listings", listingID));
+      const updatedListings=listings.filter(
+        (listing)=> listing.id!==listingID
+        // keep everything except that listingID property in listings array
+      )
+      setListings(updatedListings);
+      toast.success( "Deleted the listing Successfully!");
+    }
+  }
+  function onEdit(listingID){
+    navigate(`/edit-listing/${listingID}`);
+  }
   return (
     <>
       <section className="max-w-6xl mx-auto flex justify-center items-center flex-col">
@@ -156,6 +173,8 @@ export default function Profile() {
                   key={listing.id}
                   id={listing.id}
                   listing={listing.data}
+                  onDelete={() => onDelete(listing.id)}
+                  onEdit={() => onEdit(listing.id)}
                 />
               ))}
             </ul>
