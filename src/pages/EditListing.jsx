@@ -9,15 +9,24 @@ import {
 } from "firebase/storage";
 import { getAuth } from "firebase/auth";
 import { v4 as uuidv4 } from "uuid";
-import { addDoc, collection, serverTimestamp } from "firebase/firestore";
+import {
+  addDoc,
+  collection,
+  doc,
+  getDoc,
+  serverTimestamp,
+  updateDoc,
+} from "firebase/firestore";
 import { db } from "../firebase";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function CreateListing() {
   const navigate = useNavigate();
   const auth = getAuth();
   const [geolocationEnabled, setGeolocationEnabled] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [listing, setListing] = useState(null);
   const [formData, setFormData] = useState({
     type: "rent",
     name: "",
@@ -50,6 +59,33 @@ export default function CreateListing() {
     longitude,
     images,
   } = formData;
+
+  const params = useParams();
+
+  useEffect(() => {
+    if (listing && listing.userRef !== auth.currentUser.uid) {
+      toast.error("You can't edit this listing");
+      navigate("/");
+    }
+  }, [auth.currentUser.uid, listing, navigate]);
+
+  useEffect(() => {
+    setLoading(true);
+    async function fetchListing() {
+      const docRef = doc(db, "listings", params.listingId);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setListing(docSnap.data());
+        setFormData({ ...docSnap.data() });
+        setLoading(false);
+      } else {
+        navigate("/");
+        toast.error("Listing does not exist");
+      }
+    }
+    fetchListing();
+  }, [navigate, params.listingId]);
+
   function onChange(e) {
     let boolean = null;
     if (e.target.value === "true") {
@@ -77,7 +113,6 @@ export default function CreateListing() {
     e.preventDefault();
     setLoading(true);
     if (+discountedPrice >= +regularPrice) {
-        // sometimes number is considered as string and i overflow so to fix this we add '+' symbol in front of number to treat it as a number only
       setLoading(false);
       toast.error("Discounted price needs to be less than regular price");
       return;
@@ -93,7 +128,7 @@ export default function CreateListing() {
         const response= await fetch(`https://geocode.maps.co/search?q=${address}&api_key=660524a42b1f2555993498wke10f982`);
         const data=await response.json();
         console.log(data);
-
+      
         const result = data[1];
         if (result && result.lat && result.lon) {
             
@@ -108,11 +143,11 @@ export default function CreateListing() {
             toast.error("Please enter a correct address");
             return;
         }
-    }
-    else{
+      }
+      else{
         geolocation.lat=latitude;
         geolocation.lon=longitude;
-    }
+      }
 
     async function storeImage(image) {
       return new Promise((resolve, reject) => {
@@ -171,9 +206,11 @@ export default function CreateListing() {
     !formDataCopy.offer && delete formDataCopy.discountedPrice;
     delete formDataCopy.latitude;
     delete formDataCopy.longitude;
-    const docRef = await addDoc(collection(db, "listings"), formDataCopy);
+    const docRef = doc(db, "listings", params.listingId);
+
+    await updateDoc(docRef, formDataCopy);
     setLoading(false);
-    toast.success("Listing created");
+    toast.success("Listing Edited");
     navigate(`/category/${formDataCopy.type}/${docRef.id}`);
   }
 
@@ -182,7 +219,7 @@ export default function CreateListing() {
   }
   return (
     <main className="max-w-md px-2 mx-auto">
-      <h1 className="text-3xl text-center mt-6 font-bold">Create a Listing</h1>
+      <h1 className="text-3xl text-center mt-6 font-bold">Edit Listing</h1>
       <form onSubmit={onSubmit}>
         <p className="text-lg mt-6 font-semibold">Sell / Rent</p>
         <div className="flex">
@@ -445,7 +482,7 @@ export default function CreateListing() {
           type="submit"
           className="mb-6 w-full px-7 py-3 bg-blue-600 text-white font-medium text-sm uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
         >
-          Create Listing
+          Edit Listing
         </button>
       </form>
     </main>
