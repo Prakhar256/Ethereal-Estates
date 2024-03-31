@@ -3,7 +3,16 @@
 @tailwind utilities;
 
 body{
-    background-color: rgb(240, 253, 244);
+    /* background-color: rgb(240, 253, 244); */
+    /* background-color: #8e969e; */
+    background-color: #E6FFFA;
+    /* background-image: url("https://www.transparenttextures.com/patterns/tileable-wood.png"); */
+    background-image: url("https://wallpapers.com/images/hd/real-estate-background-vhie1v16atu3prs6.jpg");
+    background-repeat: no-repeat;
+    background-size: cover;
+    z-index:  -1;  
+    opacity: 1; 
+
 }
 .swiper-button-next:after,
 .swiper-button-prev:after{
