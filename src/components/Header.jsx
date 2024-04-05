@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Logo from "./FinalLogo.png"
+import { FaSearch } from 'react-icons/fa';
 export default function Header() {
     const [pageState, setPageState]=useState("Sign in")
     const location=useLocation();
     const navigate=useNavigate();
-
+    const [searchTerm, setSearchTerm] = useState('');
     const auth=getAuth();
     useEffect(()=>{
       onAuthStateChanged(auth,(user)=>{
@@ -18,13 +19,27 @@ export default function Header() {
         }
       })
     });
+    const handleSubmit = (e) => {
+      e.preventDefault();
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('searchTerm', searchTerm);
+      const searchQuery = urlParams.toString();
+      navigate(`/search?${searchQuery}`);
+    };
+    useEffect(() => {
+      const urlParams = new URLSearchParams(location.search);
+      const searchTermFromUrl = urlParams.get('searchTerm');
+      if (searchTermFromUrl) {
+        setSearchTerm(searchTermFromUrl);
+      }
+    }, [location.search]);
     function pathMatchRoute(route) {
         if (route === location.pathname) {
           return true;
         }
       }
     return (
-<div className="bg-white border-b shadow-sm sticky top-0 z-40" style={{backgroundColor: "rgb(230, 255, 250)"}}>
+      <div className="bg-white border-b shadow-sm sticky top-0 z-40" style={{backgroundColor: "rgb(230, 255, 250)"}}>
           <header className="flex justify-between items-center px-3 max-w-6xl mx-auto">
             <div>
               <img
@@ -36,6 +51,18 @@ export default function Header() {
                 width={300}
               />
             </div>
+            <form onSubmit={handleSubmit} className='bg-white p-3 rounded-lg flex items-center' style={{ backgroundColor: '#E6FFFA' }}>
+            <input
+            type='text'
+            placeholder='Search...'
+            className='bg-transparent border rounded-lg focus:outline-none w-24 sm:w-64 '
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <button className='ml-3'>
+            <FaSearch className='text-slate-600' />
+          </button>
+            </form>
             <div>
               <ul className="flex space-x-10">
                 <li
