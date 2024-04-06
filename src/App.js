@@ -14,6 +14,7 @@ import EditListing from "./pages/EditListing";
 import Listing from "./pages/Listing";
 import Category from "./pages/Category";
 import Search from './pages/Search';
+import Footer from "./components/Footer";
 function App() {
   return (
     <>
@@ -58,6 +59,7 @@ function App() {
           // transition={Bounce}
         />
       </Router>
+      {/* <Footer/> */}
     </>
   );
 }

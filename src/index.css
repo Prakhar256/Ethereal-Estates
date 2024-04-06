@@ -7,9 +7,15 @@ body{
     /* background-color: #8e969e; */
     background-color: #E6FFFA;
     /* background-image: url("https://www.transparenttextures.com/patterns/tileable-wood.png"); */
-    background-image: url("https://wallpapers.com/images/hd/real-estate-background-vhie1v16atu3prs6.jpg");
-    background-repeat: no-repeat;
-    background-size: cover;
+    /* background-image: url("https://wallpapers.com/images/hd/real-estate-background-vhie1v16atu3prs6.jpg"); */
+    background-color: #ffffff;
+    background-color: #ffffff;
+background-image: url("https://www.transparenttextures.com/patterns/brushed-alum-dark.png");
+
+    
+
+    /* background-repeat: no-repeat; */
+    /* background-size: cover; */
     z-index:  -1;  
     opacity: 1; 
 
@@ -20,7 +26,7 @@ body{
 }
 
 .swiper-pagination-progressbar .swiper-pagination-progressbar-fill{
-    background: #a8dadc !important
+    background: black !important
 }
 html::-webkit-scrollbar{
     display: none;
@@ -30,3 +36,12 @@ html{
     scrollbar-width: none;
 }
 /* This is used to remove the scroll bar for firefox */
+.footer-container {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    /* padding: 1rem 0; */
+    background-color: #f9f9f9;
+    /* box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1); */
+  }

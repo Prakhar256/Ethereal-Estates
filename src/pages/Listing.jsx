@@ -5,8 +5,11 @@ import { useParams } from "react-router-dom";
 import Spinner from "../components/Spinner";
 import { db } from "../firebase";
 import { Swiper, SwiperSlide } from "swiper/react";
-import { EffectFade, Autoplay, Navigation, Pagination } from "swiper/modules";
+import { EffectFade, Autoplay, Navigation, Pagination, Scrollbar } from "swiper/modules";
 import "swiper/css/bundle";
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
+import 'swiper/css/scrollbar';
 import {
   FaShare,
   FaMapMarkerAlt,
@@ -43,17 +46,20 @@ export default function Listing() {
   return (
     <main>
       <Swiper
+        modules={[Navigation, Pagination, Scrollbar, Autoplay]}
         slidesPerView={1}
         navigation
-        pagination={{ type: "progressbar" }}
-        effect="fade"
-        modules={[EffectFade]}
-        autoplay={{ delay: 3000 }}
-      >
+        pagination={{ clickable: true }}
+        scrollbar={{ draggable: true }}
+        autoplay={{
+            pauseOnMouseEnter: true,
+            delay: 3000
+        }}
+    >
         {listing.imgUrls.map((url, index) => (
           <SwiperSlide key={index}>
             <div
-              className="relative w-full overflow-hidden h-[300px]"
+              className="relative w-full overflow-hidden h-[60vh]"
               style={{
                 background: `url(${listing.imgUrls[index]}) center no-repeat`,
                 backgroundSize: "cover",

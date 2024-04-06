@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from "react-router-dom";
 import {getAuth, onAuthStateChanged} from "firebase/auth";
 import Logo from "./FinalLogo.png"
+import { Link } from 'react-router-dom';
 import { FaSearch } from 'react-icons/fa';
 export default function Header() {
     const [pageState, setPageState]=useState("Sign in")
@@ -39,19 +40,26 @@ export default function Header() {
         }
       }
     return (
-      <div className="bg-white border-b shadow-sm sticky top-0 z-40" style={{backgroundColor: "rgb(230, 255, 250)"}}>
+      <div className="bg-white border-b shadow-sm sticky top-0 z-40" >
           <header className="flex justify-between items-center px-3 max-w-6xl mx-auto">
             <div>
-              <img
+              {/* <img
                 src={Logo}
                 alt="logo"
                 className="h-14 cursor-pointer"
                 onClick={() => navigate("/")}
                 height={50}
                 width={300}
-              />
+              /> */}
+              <Link to='/'>
+              <h1 className='font-bold text-sm sm:text-xl flex flex-wrap'>
+                <span className='text-slate-500'>Ethereal </span>
+                <span className='text-slate-700 ml-1'> Estates</span>
+              </h1>
+              </Link>
+
             </div>
-            <form onSubmit={handleSubmit} className='bg-white p-3 rounded-lg flex items-center' style={{ backgroundColor: '#E6FFFA' }}>
+            <form onSubmit={handleSubmit} className='bg-white p-3 rounded-lg flex items-center'>
             <input
             type='text'
             placeholder='Search...'

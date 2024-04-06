@@ -1,8 +1,17 @@
 import React from 'react'
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import ListingItem from '../components/ListingItem';
-
+import Spinner from "../components/Spinner";
+import {
+    collection,
+    getDocs,
+    limit,
+    orderBy,
+    query,
+    where,
+  } from "firebase/firestore";
+import { db } from '../firebase';
 export default function Search() {
     const navigate = useNavigate();
     const [sidebardata, setSidebardata] = useState({
@@ -14,19 +23,159 @@ export default function Search() {
       sort: 'created_at',
       order: 'desc',
     });
-  
+    
     const [loading, setLoading] = useState(false);
     const [listings, setListings] = useState([]);
     const [showMore, setShowMore] = useState(false);
-  
-    
+    console.log(listings);
+    useEffect(()=>{
+        const urlParams=new URLSearchParams(window.location.search);
+        const searchTermFromUrl = urlParams.get('searchTerm');
+        const typeFromUrl = urlParams.get('type');
+        const parkingFromUrl = urlParams.get('parking');
+        const furnishedFromUrl = urlParams.get('furnished');
+        const offerFromUrl = urlParams.get('offer');
+        const sortFromUrl = urlParams.get('sort');
+        const orderFromUrl = urlParams.get('order');
+
+        if (
+        searchTermFromUrl ||
+        typeFromUrl ||
+        parkingFromUrl ||
+        furnishedFromUrl ||
+        offerFromUrl ||
+        sortFromUrl ||
+        orderFromUrl
+        ){
+            setSidebardata({
+                searchTerm: searchTermFromUrl || '',
+                type: typeFromUrl || 'all',
+                parking: parkingFromUrl === 'true' ? true : false,
+                furnished: furnishedFromUrl === 'true' ? true : false,
+                offer: offerFromUrl === 'true' ? true : false,
+                sort: sortFromUrl || 'created_at',
+                order: orderFromUrl || 'desc',
+            });
+        }
+
+        async function fetchListings() {
+            setLoading(true);
+            setShowMore(false);
+            try {
+                const listingsRef = collection(db, "listings");
+                const urlParams=new URLSearchParams(window.location.search)
+                
+                const searchTermFromUrl = urlParams.get('searchTerm');
+                const typeFromUrl = urlParams.get('type');
+                const parkingFromUrl = urlParams.get('parking');
+                const furnishedFromUrl = urlParams.get('furnished');
+                const offerFromUrl = urlParams.get('offer');
+                const sortFromUrl = urlParams.get('sort');
+                const orderFromUrl = urlParams.get('order');
+
+                const filters = [];
+                if(searchTermFromUrl) {
+                    filters.push(where("name", "==", searchTermFromUrl))
+                }
+                if(typeFromUrl){
+                    filters.push(where("type", "==", typeFromUrl))
+                }
+                if(parkingFromUrl){
+                    filters.push(
+                        where("parking", "==", parkingFromUrl)
+                    )
+                }
+                if(furnishedFromUrl){
+                    filters.push(
+                        where("furnished", "==", furnishedFromUrl)
+                    )
+                }
+                if(offerFromUrl){
+                    filters.push(
+                        where("offer", "==", offerFromUrl)
+                    )
+                }
+
+                // const q = query(listingsRef, 
+                //     ...filters,
+                //     orderBy(sortFromUrl, orderFromUrl),
+                //     limit(8)
+                // );
+
+                const q = query(listingsRef, 
+                        "filters",
+                        // ...filters,
+                        // orderBy(sortFromUrl, orderFromUrl),
+                        orderBy("timestamp", "desc"),
+                        limit(8)
+                    );
+
+                const querySnap = await getDocs(q);
+                const listings = [];
+                querySnap.forEach((doc) => {
+                    return listings.push({
+                    id: doc.id,
+                    data: doc.data(),
+                    });
+                });
+                console.log(listings);
+                setListings(listings);
+                setLoading(false);
+            }
+            
+            catch (error) {
+                console.log(error);
+            }
+        }    
+        fetchListings();
+    },[window.location.search])
   
     const handleChange = (e) => {
-      
-    };
+        if (
+          e.target.id === 'all' ||
+          e.target.id === 'rent' ||
+          e.target.id === 'sale'
+        ) {
+          setSidebardata({ ...sidebardata, type: e.target.id });
+        }
+    
+        if (e.target.id === 'searchTerm') {
+          setSidebardata({ ...sidebardata, searchTerm: e.target.value });
+        }
+    
+        if (
+          e.target.id === 'parking' ||
+          e.target.id === 'furnished' ||
+          e.target.id === 'offer'
+        ) {
+          setSidebardata({
+            ...sidebardata,
+            [e.target.id]:
+              e.target.checked || e.target.checked === 'true' ? true : false,
+          });
+        }
+    
+        if (e.target.id === 'sort_order') {
+          const sort = e.target.value.split('_')[0] || 'created_at';
+    
+          const order = e.target.value.split('_')[1] || 'desc';
+    
+          setSidebardata({ ...sidebardata, sort, order });
+        }
+      };
   
     const handleSubmit = (e) => {
-      
+      e.preventDefault();
+        const urlParams=new URLSearchParams();
+        urlParams.set('searchTerm', sidebardata.searchTerm);
+        urlParams.set('type', sidebardata.type);
+        urlParams.set('parking', sidebardata.parking);
+        urlParams.set('furnished', sidebardata.furnished);
+        urlParams.set('offer', sidebardata.offer);
+        urlParams.set('sort', sidebardata.sort);
+        urlParams.set('order', sidebardata.order);
+        const searchQuery = urlParams.toString();
+        navigate(`/search?${searchQuery}`);
     };
   
     const onShowMoreClick = async () => {
@@ -145,17 +294,28 @@ export default function Search() {
               <p className='text-xl text-slate-700'>No listing found!</p>
             )}
             {loading && (
-              <p className='text-xl text-slate-700 text-center w-full'>
-                Loading...
-              </p>
+              <Spinner/>
             )}
   
-            {!loading &&
-              listings &&
-              listings.map((listing) => (
-                <ListingItem key={listing._id} listing={listing} />
-              ))}
-  
+            <div className="max-w-6xl px-3 mt-6 mx-auto">
+                {!loading && listings.length > 0 && (
+                <>
+                    <h2 className="text-2xl text-center font-semibold mb-6">
+                    My Listings
+                    </h2>
+                    <ul className="sm:grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+                    {listings.map((listing) => (
+                        <ListingItem
+                        key={listing.id}
+                        id={listing.id}
+                        listing={listing.data}                  
+                        />
+                    ))}
+                    </ul>
+                </>
+                )}
+            </div>
+    
             {showMore && (
               <button
                 onClick={onShowMoreClick}
