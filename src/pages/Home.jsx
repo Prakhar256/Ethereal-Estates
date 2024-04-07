@@ -1,6 +1,7 @@
 import React, { createElement } from 'react'
 import Slider from '../components/Slider'
 import { useEffect, useState } from 'react'
+import home from '../assets/home1.png'
 import {
   collection,
   getDoc,
@@ -106,6 +107,7 @@ export default function Home() {
     }, []);
   return (
     <><div>
+    {/* <div className='flex'> */}
       <div className='flex flex-col gap-6 p-28 px-3 max-w-6xl mx-auto '>
         <h1 className='text-slate-700 font-bold text-3xl lg:text-6xl'>
           Find your next <span className='text-slate-500'>perfect</span>
@@ -125,6 +127,14 @@ export default function Home() {
           Let's get started...
         </Link>
       </div>
+      {/* <div className="md:w-[67%] lg:w-[50%] mb-12  mr-10 md:mb-6 " >
+      <img
+        src="https://img.freepik.com/premium-photo/modern-house-sweet-home-luxury-white-clear-surface-png-transparent-background_94628-30373.jpg"
+        alt="key"
+        className="w-1000 ml-40 mr-30 mt-50 rounded-2xl w-600 h-1000 max-h-[40vh] object-contain object-center 2xl:max-h-[50vh]"
+      />
+      </div> */}
+      {/* </div> */}
       <Slider />
       <div>
         {offerListings && offerListings.length > 0 && (
