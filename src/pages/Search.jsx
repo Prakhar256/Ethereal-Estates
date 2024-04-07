@@ -107,7 +107,7 @@ export default function Search() {
                         // ...filters,
                         // orderBy(sortFromUrl, orderFromUrl),
                         orderBy("timestamp", "desc"),
-                        limit(8)
+                        // limit(8)
                     );
 
                 const querySnap = await getDocs(q);
